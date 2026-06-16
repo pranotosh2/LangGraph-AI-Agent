@@ -19,8 +19,11 @@ jobs:
           python-version: "3.11"
 
       - run: pip install -r requirements.txt
-
-      - run: pytest
+      - name: Trigger Backend Deploy
+        run: |
+          curl -X POST ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}
+      - name: Run pytest
+        run: pytest
 
   deploy:
 
@@ -29,10 +32,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
-      - name: Trigger Backend Deploy
-        run: |
-          curl -X POST ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}
 
       - name: Trigger Frontend Deploy
         run: |
