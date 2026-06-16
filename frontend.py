@@ -47,7 +47,10 @@ user_query = st.text_area(
     height=150
 )
 
-API_URL = os.getenv("BACKEND_URL")
+API_URL = os.getenv(
+    "BACKEND_URL",
+    "http://localhost:8000/chat"
+)
 
 if st.button("Ask Agent"):
 
