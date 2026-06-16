@@ -14,3 +14,7 @@ langchain-tavily
 tavily-python
 
 pydantic
+
+pytest
+httpx
+flake8
