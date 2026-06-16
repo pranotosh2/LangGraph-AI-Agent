@@ -39,4 +39,4 @@ jobs:
 
       - name: Trigger Frontend Deploy
         run: |
-          curl -X POST ${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK }}
+          curl -X POST ${{ secrets.RENDER_FRONTED_DEPLOY_HOOK }}
