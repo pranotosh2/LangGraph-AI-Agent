@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 import os
+
 st.set_page_config(
     page_title="LangGraph Agent",
     layout="centered"
@@ -13,30 +14,25 @@ system_prompt = st.text_area(
     value="You are a helpful AI assistant."
 )
 
-MODEL_NAMES_GROQ = [
-    "llama-3.3-70b-versatile",
-    "openai/gpt-oss-120b"
-]
+# 1. Aligned exactly with ALLOWED_MODEL_NAMES in backend.py
+MODEL_MAP = {
+    "groq": ["llama-3.3-70b-versatile"],
+    "google": ["gemini-2.5-flash"],
+    "openai": ["openai/gpt-oss-120b"],
+    "x-ai": ["x-ai/grok-4.1-fast"]
+}
 
-MODEL_NAMES_GOOGLE = [
-    "gemini-2.5-flash"
-]
-
+# Dynamic radio selection using keys from our model map
 provider = st.radio(
     "Select Provider",
-    ("groq", "google")
+    options=list(MODEL_MAP.keys())
 )
 
-if provider == "groq":
-    selected_model = st.selectbox(
-        "Select Model",
-        MODEL_NAMES_GROQ
-    )
-else:
-    selected_model = st.selectbox(
-        "Select Model",
-        MODEL_NAMES_GOOGLE
-    )
+# Dynamically populate the dropdown based on selected provider
+selected_model = st.selectbox(
+    "Select Model",
+    options=MODEL_MAP[provider]
+)
 
 allow_web_search = st.checkbox(
     "Allow Web Search"
@@ -47,9 +43,10 @@ user_query = st.text_area(
     height=150
 )
 
+# Pulled from your Render environment variable setup
 API_URL = os.getenv(
     "BACKEND_URL",
-    "http://localhost:8000/chat"
+    "https://langgraph-ai-backend.onrender.com/chat"
 )
 
 if st.button("Ask Agent"):
@@ -66,7 +63,7 @@ if st.button("Ask Agent"):
         "allow_search": allow_web_search
     }
 
-    # 1. Handle network connection strictly
+    # Handle network connection strictly
     try:
         response = requests.post(
             API_URL,
@@ -77,12 +74,11 @@ if st.button("Ask Agent"):
         st.error(f"Failed to connect to API backend server: {str(e)}")
         st.stop()
 
-    # 2. Process the server response safely
+    # Process the server response safely
     if response.status_code == 200:
         try:
             data = response.json()
             
-            # Ensure the response data is a dictionary before looking up string keys
             if isinstance(data, dict):
                 if "error" in data:
                     st.error(data["error"])
@@ -93,15 +89,12 @@ if st.button("Ask Agent"):
                     st.warning("Unexpected JSON structure received from API.")
                     st.json(data)
             else:
-                # Fallback if JSON parsed into a plain string or list instead of a dict
                 st.subheader("Response")
                 st.write(data)
                 
         except ValueError:
-            # Falls here if the backend returned a 200 OK but sent raw text instead of JSON
             st.subheader("Response (Raw Text)")
             st.write(response.text)
 
     else:
-        # Displays explicit error codes (like 404, 422 Unprocessable Entity, or 500 Internal Error)
         st.error(f"Backend Error (Status {response.status_code}): {response.text}")
