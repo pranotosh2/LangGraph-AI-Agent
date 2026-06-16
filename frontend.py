@@ -1,80 +1,59 @@
 import streamlit as st
 import requests
 import os
-
-# --------------------------------------------------
-# Page Config
-# --------------------------------------------------
 st.set_page_config(
-    page_title="LangGraph AI Agent",
+    page_title="LangGraph Agent",
     layout="centered"
 )
 
 st.title("🤖 AI Chatbot Agent")
 
-# --------------------------------------------------
-# System Prompt
-# --------------------------------------------------
 system_prompt = st.text_area(
     "System Prompt",
     value="You are a helpful AI assistant."
 )
 
-# --------------------------------------------------
-# Models
-# --------------------------------------------------
-MODEL_MAP = {
-    "groq": [
-        "llama-3.3-70b-versatile",
-        "openai/gpt-oss-120b"
-    ],
-    "google": [
-        "gemini-2.5-flash"
-    ]
-}
+MODEL_NAMES_GROQ = [
+    "llama-3.3-70b-versatile",
+    "openai/gpt-oss-120b"
+]
 
-# --------------------------------------------------
-# Provider Selection
-# --------------------------------------------------
+MODEL_NAMES_GOOGLE = [
+    "gemini-2.5-flash"
+]
+
 provider = st.radio(
     "Select Provider",
-    options=list(MODEL_MAP.keys())
+    ("groq", "google")
 )
 
-# --------------------------------------------------
-# Model Selection
-# --------------------------------------------------
-selected_model = st.selectbox(
-    "Select Model",
-    options=MODEL_MAP[provider]
-)
+if provider == "groq":
+    selected_model = st.selectbox(
+        "Select Model",
+        MODEL_NAMES_GROQ
+    )
+else:
+    selected_model = st.selectbox(
+        "Select Model",
+        MODEL_NAMES_GOOGLE
+    )
 
-# --------------------------------------------------
-# Search Option
-# --------------------------------------------------
 allow_web_search = st.checkbox(
     "Allow Web Search"
 )
 
-# --------------------------------------------------
-# User Query
-# --------------------------------------------------
 user_query = st.text_area(
     "Enter Query",
     height=150
 )
 
-# --------------------------------------------------
-# Backend URL
-# --------------------------------------------------
+
+
 API_URL = os.getenv(
     "BACKEND_URL",
     "https://langgraph-ai-backend.onrender.com/chat"
 )
 
-# --------------------------------------------------
-# Submit Button
-# --------------------------------------------------
 if st.button("Ask Agent"):
 
     if not user_query.strip():
@@ -89,51 +68,42 @@ if st.button("Ask Agent"):
         "allow_search": allow_web_search
     }
 
+    # 1. Handle network connection strictly
     try:
-        with st.spinner("Generating response..."):
-
-            response = requests.post(
-                API_URL,
-                json=payload,
-                timeout=120
-            )
-
-    except requests.exceptions.RequestException as e:
-        st.error(
-            f"Failed to connect to backend server:\n{str(e)}"
+        response = requests.post(
+            API_URL,
+            json=payload,
+            timeout=120
         )
+    except requests.exceptions.RequestException as e:
+        st.error(f"Failed to connect to API backend server: {str(e)}")
         st.stop()
 
-    # --------------------------------------------------
-    # Response Handling
-    # --------------------------------------------------
+    # 2. Process the server response safely
     if response.status_code == 200:
-
         try:
             data = response.json()
-
+            
+            # Ensure the response data is a dictionary before looking up string keys
             if isinstance(data, dict):
-
                 if "error" in data:
                     st.error(data["error"])
-
                 elif "response" in data:
                     st.subheader("Response")
                     st.write(data["response"])
-
                 else:
-                    st.subheader("Response")
+                    st.warning("Unexpected JSON structure received from API.")
                     st.json(data)
-
             else:
+                # Fallback if JSON parsed into a plain string or list instead of a dict
                 st.subheader("Response")
                 st.write(data)
-
+                
         except ValueError:
-            st.subheader("Response")
+            # Falls here if the backend returned a 200 OK but sent raw text instead of JSON
+            st.subheader("Response (Raw Text)")
             st.write(response.text)
 
     else:
-        st.error(
-            f"Backend Error ({response.status_code})\n{response.text}"
-        )
+        # Displays explicit error codes (like 404, 422 Unprocessable Entity, or 500 Internal Error)
+        st.error(f"Backend Error (Status {response.status_code}): {response.text}")
