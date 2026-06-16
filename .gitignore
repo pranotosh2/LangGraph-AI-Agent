@@ -1,0 +1,71 @@
+# Environment Variables
+
+.env
+
+# Python Cache
+
+**pycache**/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+
+venv/
+env/
+ENV/
+.venv/
+
+# Pipenv
+
+Pipfile.lock
+
+# Streamlit
+
+.streamlit/secrets.toml
+
+# IDE Files
+
+.vscode/
+.idea/
+
+# OS Files
+
+.DS_Store
+Thumbs.db
+
+# Logs
+
+*.log
+
+# Build / Distribution
+
+build/
+dist/
+*.egg-info/
+
+# Jupyter Notebooks
+
+.ipynb_checkpoints/
+
+# Testing
+
+.pytest_cache/
+.coverage
+htmlcov/
+
+# MyPy
+
+.mypy_cache/
+
+# Ruff
+
+.ruff_cache/
+
+# Render
+
+.render/
+
+# Temporary Files
+
+*.tmp
+*.bak
