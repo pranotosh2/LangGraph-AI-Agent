@@ -23,6 +23,8 @@ jobs:
         run: |
           curl -X POST ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}
       - name: Run pytest
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: pytest
 
   deploy:
