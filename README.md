@@ -1,30 +1,90 @@
-# LangGraph-AI-Agent
-# LangGraph AI Agent
+# 🤖 LangGraph AI Agent
 
-A multi-provider AI chatbot built with:
+A production-ready AI chatbot built using LangGraph, LangChain, FastAPI, Streamlit, Groq, Gemini, and Tavily Search.
 
-* FastAPI (Backend API)
-* Streamlit (Frontend UI)
-* LangGraph
-* LangChain
-* Groq Models
-* Google Gemini
-* Tavily Search
+## 🚀 Live Demo
 
-## Features
-
-* Multiple LLM providers
-
-  * Groq
-  * Google Gemini
-* Web Search using Tavily
-* Streamlit User Interface
-* FastAPI Backend
-* LangGraph ReAct Agent
+[https://langgraph-ai-frontend.onrender.com](https://langgraph-ai-frontend.onrender.com/)
 
 ---
 
-## Project Structure
+## 📌 Features
+
+* Multi-Provider LLM Support
+
+  * Groq Models
+  * Google Gemini
+* LangGraph ReAct Agent
+* Optional Web Search via Tavily
+* FastAPI REST API
+* Streamlit Frontend
+* Environment Variable Management
+* Render Deployment
+* GitHub Actions CI/CD
+* Automated Testing with Pytest
+
+---
+
+## 🏗️ System Architecture
+
+```text
+User
+ │
+ ▼
+Streamlit Frontend
+ │
+ ▼
+FastAPI Backend
+ │
+ ▼
+LangGraph ReAct Agent
+ │
+ ├── Groq
+ │
+ ├── Gemini
+ │
+ └── Tavily Search
+```
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+
+* Streamlit
+
+### Backend
+
+* FastAPI
+* Uvicorn
+
+### AI Framework
+
+* LangChain
+* LangGraph
+
+### LLM Providers
+
+* Groq
+* Google Gemini
+
+### Search Tool
+
+* Tavily Search
+
+### DevOps
+
+* GitHub Actions
+* Render
+
+### Testing
+
+* Pytest
+
+---
+
+## 📂 Project Structure
 
 ```text
 AI_Asistant/
@@ -32,14 +92,22 @@ AI_Asistant/
 ├── ai_agent.py
 ├── backend.py
 ├── frontend.py
-├── .env
+│
+├── tests/
+│   └── test_api.py
+│
+├── .github/
+│   └── workflows/
+│       └── ci_cd.yml
+│
 ├── requirements.txt
+├── .env
 └── README.md
 ```
 
 ---
 
-## Environment Variables
+## ⚙️ Environment Variables
 
 Create a `.env` file:
 
@@ -51,19 +119,23 @@ TAVILY_API_KEY=your_tavily_api_key
 
 ---
 
-## Installation
+## 🔧 Installation
 
 ```bash
-git clone <repository-url>
-conda create -n <env_name> python=3.11
-cd AI_Asistant
+git clone https://github.com/pranotosh2/LangGraph-AI-Agent.git
+
+cd LangGraph-AI-Agent
+
+conda create -n ai python=3.11
+
+conda activate ai
 
 pip install -r requirements.txt
 ```
 
 ---
 
-## Run Backend
+## ▶️ Run Backend
 
 ```bash
 uvicorn backend:app --reload
@@ -75,7 +147,7 @@ Backend URL:
 http://127.0.0.1:8000
 ```
 
-Swagger Documentation:
+Swagger Docs:
 
 ```text
 http://127.0.0.1:8000/docs
@@ -83,7 +155,7 @@ http://127.0.0.1:8000/docs
 
 ---
 
-## Run Frontend
+## ▶️ Run Frontend
 
 ```bash
 streamlit run frontend.py
@@ -96,34 +168,9 @@ http://localhost:8501
 ```
 
 ---
-
-## API Request Example
-
-POST `/chat`
-
-```json
-{
-  "model_name": "llama-3.3-70b-versatile",
-  "model_provider": "groq",
-  "system_prompt": "You are a helpful AI assistant.",
-  "messages": [
-    "What is LangGraph?"
-  ],
-  "allow_search": true
-}
-```
-
-Example Response:
-
-```json
-{
-  "response": "LangGraph is a framework for building stateful AI agents..."
-}
-```
-
 ---
 
-## Supported Models
+## 🤖 Supported Models
 
 ### Groq
 
@@ -136,81 +183,95 @@ Example Response:
 
 ---
 
-# Deploying Backend on Render
+## 🧪 Running Tests
 
-## Create Web Service
+Run all tests:
 
-1. Push project to GitHub.
-2. Login to Render.
-3. Click New → Web Service.
-4. Connect GitHub repository.
-5. Configure:
+```bash
+pytest -v
+```
 
-### Build Command
+Example Output:
+
+```text
+tests/test_api.py::test_invalid_model PASSED
+```
+
+---
+
+## 🚀 Deployment
+
+### Backend (Render)
+
+Build Command:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### Start Command
+Start Command:
 
 ```bash
 uvicorn backend:app --host 0.0.0.0 --port $PORT
 ```
 
+Environment Variables:
+
+```env
+GROQ_API_KEY=
+GOOGLE_API_KEY=
+TAVILY_API_KEY=
+```
+
 ---
 
-## Add Environment Variables
+### Frontend (Render)
 
-In Render Dashboard:
+Build Command:
 
-Environment → Add Variables
+```bash
+pip install -r requirements.txt
+```
+
+Start Command:
+
+```bash
+streamlit run frontend.py --server.port=$PORT --server.address=0.0.0.0
+```
+
+Environment Variable:
+
+```env
+BACKEND_URL=https://langgraph-ai-backend.onrender.com/chat
+```
+---
+
+## 🔄 CI/CD Pipeline
 
 ```text
-GROQ_API_KEY=xxxxxxxx
-GOOGLE_API_KEY=xxxxxxxx
-TAVILY_API_KEY=xxxxxxxx
+Developer Push
+       │
+       ▼
+GitHub Repository
+       │
+       ▼
+GitHub Actions
+       │
+       ├── Install Dependencies
+       ├── Run Pytest
+       └── Deploy to Render
 ```
-
 ---
 
-## Update Frontend API URL
-
-Replace:
-
-```python
-API_URL = "http://127.0.0.1:8000/chat"
-```
-
-with:
-
-```python
-API_URL = "https://your-render-service.onrender.com/chat"
-```
-
----
-
-## Deploy Streamlit
-
-You can deploy the frontend separately on:
-
-* Render
-* Streamlit Community Cloud
-
-If using Streamlit Cloud:
-
-1. Push code to GitHub.
-2. Connect repository.
-3. Set the main file:
-
-```text
-frontend.py
-```
-
-4. Deploy.
-
----
-
-## Author
+## 👨‍💻 Author
 
 Pranotosh Mandal
+
+GitHub:
+https://github.com/pranotosh2
+
+---
+
+## ⭐ Support
+
+If you found this project useful, consider giving it a star on GitHub.
